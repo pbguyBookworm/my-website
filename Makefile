@@ -1,5 +1,6 @@
 # Image URL to use all building/pushing image targets
 IMG ?= dbao1/website-controller:latest
+PLATFORMS ?= linux/amd64,linux/arm64
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -117,11 +118,11 @@ run: manifests generate fmt vet ## Run a controller from your host.
 # More info: https://docs.docker.com/develop/develop-images/build_enhancements/
 .PHONY: docker-build
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build -t ${IMG} .
+	docker buildx build --platform=$(PLATFORMS) -t ${IMG} . --load
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
-	$(CONTAINER_TOOL) push ${IMG}
+	docker buildx build --platform=$(PLATFORMS) -t ${IMG} . --push
 
 # PLATFORMS defines the target platforms for the manager image be built to provide support to multiple
 # architectures. (i.e. make docker-buildx IMG=myregistry/mypoperator:0.0.1). To use this option you need to:
